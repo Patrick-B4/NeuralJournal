@@ -77,3 +77,7 @@ body {
     tracking-tighter text-transparent pr-2 pb-2;
   }
 }
+
+html{
+  scroll-behavior: smooth;
+}
