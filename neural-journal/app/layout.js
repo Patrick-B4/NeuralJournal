@@ -1,10 +1,9 @@
-// app/layout.js
 import "./globals.css";
 import { Inter } from "next/font/google";
 import SiteHeader from "@/components/header";
-
-// Import your new client-side Clerk wrapper
 import ClerkProviderWrapper from "./ClerkProviderWrapper";
+import { Toaster } from "sonner";
+import "react-quill-new/dist/quill.snow.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,6 +21,7 @@ export default function RootLayout({ children }) {
           <div className="bg-[url('/bg.png')] opacity-50 fixed -z-10 inset-0" />
           <SiteHeader />
           <main className="min-h-screen">{children}</main>
+          <Toaster richColors />
           <footer className="bg-orange-300 py-12 bg-opacity-10">
             <div className="mx-auto px-4 text-center text-gray-900">
               <p>Made with love by Patrick and Roy</p>

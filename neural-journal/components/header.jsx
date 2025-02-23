@@ -1,4 +1,3 @@
-"use client"; 
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -9,9 +8,11 @@ import { SignedIn } from '@clerk/nextjs'
 import { Button } from './ui/button'
 import { FolderOpen, PenBox } from 'lucide-react';
 import UserMenu from './user-menu';
+import { checkUser } from '@/lib/checkUser';
 
 
-const SiteHeader = () => {
+const SiteHeader = async() => {
+    await checkUser();
   return (
     <header className='container mx-auto'>
         <nav className='py-6 px-4 flex justify-between items-center'>
