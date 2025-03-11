@@ -105,4 +105,23 @@ export async function getCollections() {
     });
   
     return collections;
-  }
+}
+
+export async function getCollection(collectionId) {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+  
+    const user = await db.user.findUnique({
+      where: { clerkUserID: userId },
+    });
+  
+    if (!user) {
+      throw new Error("User not found");
+    }
+  
+    const collections = await db.collection.findUnique({
+      where: { userId: user.id, id: collectionId },
+    });
+  
+    return collections;
+}
