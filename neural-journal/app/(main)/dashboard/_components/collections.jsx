@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 const Collections = ({collections = [], entriesByCollection}) => {
     const [isCollectionDialogOpen, setIsCollectionDialogOpen] = useState(false);
 
-    const handleCreateCollection = async () => {
+    const handleCreateCollection = async (data) => {
         createCollectionFn(data);
     };
 
