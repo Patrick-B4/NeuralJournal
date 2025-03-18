@@ -11,7 +11,7 @@ const Dashboard = async () => {
   console.log("collections:", collections);
 
   // Group entries by collection
-  const entriesByCollection = entriesData.data.entries.reduce(
+  const entriesByCollection = (entriesData?.data?.entries || []).reduce(
     (acc, entry) => {
       const collectionId = entry.collectionId || "unorganized";
       if (!acc[collectionId]) {
@@ -22,6 +22,7 @@ const Dashboard = async () => {
     },
     {}
   );
+  
 
   return (
     <div className="px-4 py-8 space-y-8">
