@@ -1,4 +1,4 @@
-import { getJounralEntry } from '@/actions/journal';
+import { getJournalEntry } from '@/actions/journal';
 import { getMoodById } from '@/app/lib/moods';
 import React from 'react'
 import Image from 'next/image';
@@ -11,7 +11,7 @@ import DeleteDialog from './_components/delete-dialogue';
 const JournalEntryPage = async ({params}) => {
     const { id } = params;
 
-    const entry = await getJounralEntry(id);
+    const entry = await getJournalEntry(id);
     const mood = getMoodById(entry.mood);
   return (
     <>
