@@ -69,17 +69,17 @@ export function JournalFilters({ entries }) {
       <div className="flex flex-wrap gap-4">
         <div className="flex-1 min-w-[200px]">
           <Input
-            placeholder="Search entries..."
+            placeholder="Search Entries..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full"
+            className="w-full text-violet-200 placeholder:text-violet-200"
             prefix={<Search className="h-4 w-4 text-gray-400" />}
           />
         </div>
 
         <Select value={selectedMood} onValueChange={setSelectedMood}>
-          <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Filter by mood" />
+          <SelectTrigger className="text-violet-200 w-[150px]">
+            <SelectValue placeholder="Filter by Mood" />
           </SelectTrigger>
           <SelectContent>
             {Object.values(MOODS).map((mood) => (

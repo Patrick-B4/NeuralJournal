@@ -11,7 +11,7 @@ import { Select, SelectTrigger, SelectValue, SelectItem, SelectContent } from '@
 import { getMoodById, MOODS } from '@/app/lib/moods';
 import { Button } from '@/components/ui/button';
 import useFetch from '@/hooks/use-fetch';
-import { createJournalEntry, getDraft, getJounralEntry, saveDraft, updateJournalEntry } from '@/actions/journal';
+import { createJournalEntry, getDraft, getJournalEntry, saveDraft, updateJournalEntry } from '@/actions/journal';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { getCollections } from '@/actions/collection';
@@ -31,7 +31,7 @@ const JournalEntryPage = () => {
     const editId = searchParams.get("edit");
     const [isEditMode, setIsEditMode] = useState(false);
 
-    const {loading: entryLoading, fn: fetchEntry, data: existingEntry} = useFetch(getJounralEntry);
+    const {loading: entryLoading, fn: fetchEntry, data: existingEntry} = useFetch(getJournalEntry);
 
     const {loading: draftLoading, fn: fetchDraft, data: draftData} = useFetch(getDraft);
 
@@ -162,15 +162,15 @@ const JournalEntryPage = () => {
     const isLoading = actionLoading || collectionsLoading || entryLoading || draftLoading || savingDraft;
 
     return (
-        <div className='py-8'>
+        <div className='text-violet-100 py-8'>
             <form className='space-y-2 mx-auto' onSubmit={onSubmit}>
                 <h1 className='text-5xl md:text-6xl gradient-title'>
                     {isEditMode ? "Edit Entry" : "What's on your mind?"}
                 </h1>
 
-                {isLoading && <BarLoader color='orange' width={"100%"}/>}
+                {isLoading && <BarLoader color='violet' width={"100%"}/>}
 
-                <div className='space-y-2'>
+                <div className='textspace-y-2'>
                     <label className='text-sm font-medium'>Title</label>
                     <Input {...register("title")}
                     placeholder='Give your entry a title...'
@@ -266,7 +266,7 @@ const JournalEntryPage = () => {
                                         )
                                     })}
                                     <SelectItem value='new'>
-                                        <span className='text-orange-600'>
+                                        <span className='text-violet-600'>
                                             + Create New Collection
                                         </span>
                                     </SelectItem>

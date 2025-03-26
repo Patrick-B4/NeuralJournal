@@ -8,84 +8,15 @@ import { getMoodById, MOODS } from "@/app/lib/moods";
 import aj from "@/lib/arcjet";
 import { request } from "@arcjet/next";
 
-
-// export async function createJournalEntry(data){
-//     try {
-//         const {userId} = await auth();
-//         if(!userId) throw new Error("Unathorized");
-
-//         //ArcJet Rate Limiting
-//         const req = await request()
-
-//         const decision = await aj.protect(req, {
-//             userId,
-//             requested: 1,
-//         });
-
-//         if(decision.isDenied()) {
-//             if(decision.reason.isRateLimit()) {
-//                 const {remaining, reset} = decision.reason;
-//                 console.error({
-//                     code: "RATE_LIMIT_EXCEEDED",
-//                     details: {
-//                         remaining, 
-//                         resetInSeconds: reset,
-//                     },
-//                 });
-
-//                 throw new Error("Too many requests. Please try again later.");
-//             }
-
-//             throw new Error("Request Blocked");
-//         }
-
-//         const user = await db.user.findUnique({
-//             where: {clerkUserID: userId},
-//         });
-
-//         if(!user) {
-//             throw new Error("User not found");
-//         }
-
-//         const mood = MOODS[data.mood.toUpperCase()];
-//         if(!mood) throw new Error("Invalid mood");
-
-//         const moodImageUrl = await getPixabayImage(data.moodQuery);
-
-//         const entry =  await db.entry.create({
-//             data:{
-//                 title:data.title,
-//                 content:data.content,
-//                 mood: mood.id,
-//                 moodScore: mood.score,
-//                 moodImageUrl,
-//                 userId: user.id,
-//                 collectionId: data.collectionId || null,
-//             }
-//         });
-
-//         await db.draft.deleteMany({
-//             where: {userId: user.id},
-//         });
-
-//         revalidatePath('/dashboard/');
-
-//         return entry
-
-//     } catch (error) {
-//         throw new Error(error.message);
-//     }
-// }
-
+// Create Journal Entry function
 export async function createJournalEntry(data) {
   try {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
-    // Get request data for ArcJet
+    // ArcJet Rate Limiting
     const req = await request();
 
-    // Check rate limit
     const decision = await aj.protect(req, {
       userId,
       requested: 1, // Specify how many tokens to consume
@@ -121,9 +52,15 @@ export async function createJournalEntry(data) {
     if (!mood) throw new Error("Invalid mood");
 
     // Get mood image from Pixabay
-    const moodImageUrl = await getPixabayImage(data.moodQuery);
+    let moodImageUrl = await getPixabayImage(data.moodQuery);
 
-    // Create the entry
+    // Handle case where image URL is not found or returned as null
+    if (!moodImageUrl) {
+      console.warn("No image found for mood. Using default image.");
+      moodImageUrl = "default-image-url"; // Replace with your default image URL
+    }
+
+    // Create the journal entry
     const entry = await db.entry.create({
       data: {
         title: data.title,
@@ -144,21 +81,15 @@ export async function createJournalEntry(data) {
     revalidatePath("/dashboard");
     return entry;
   } catch (error) {
+    console.error("Error creating journal entry:", error);
     throw new Error(error.message);
   }
 }
 
-
+// Get Journal Entries function
 export async function getJournalEntries({
   collectionId,
-  // ---- Filters can be implemented with backend as well ----
-  // mood = null,
-  // searchQuery = "",
-  // startDate = null,
-  // endDate = null,
-  // page = 1,
-  // limit = 10,
-  orderBy = "desc", // or "asc"
+  orderBy = "desc", // Default order by creation date
 } = {}) {
   try {
     const { userId } = await auth();
@@ -173,33 +104,12 @@ export async function getJournalEntries({
     // Build where clause based on filters
     const where = {
       userId: user.id,
-      // If collectionId is explicitly null, get unorganized entries
-      // If it's undefined, get all entries
       ...(collectionId === "unorganized"
         ? { collectionId: null }
         : collectionId
-          ? { collectionId }
-          : {}),
-
-      // ---- Filters can be implemented with backend as well ----
-      // ...(mood && { mood }),
-      // ...(searchQuery && {
-      //   OR: [
-      //     { title: { contains: searchQuery, mode: "insensitive" } },
-      //     { content: { contains: searchQuery, mode: "insensitive" } },
-      //   ],
-      // }),
-      // ...((startDate || endDate) && {
-      //   createdAt: {
-      //     ...(startDate && { gte: new Date(startDate) }),
-      //     ...(endDate && { lte: new Date(endDate) }),
-      //   },
-      // }),
+        ? { collectionId }
+        : {}),
     };
-
-    // ---- Get total count for pagination ----
-    // const totalEntries = await db.entry.count({ where });
-    // const totalPages = Math.ceil(totalEntries / limit);
 
     // Get entries with pagination
     const entries = await db.entry.findMany({
@@ -215,8 +125,6 @@ export async function getJournalEntries({
       orderBy: {
         createdAt: orderBy,
       },
-      // skip: (page - 1) * limit,
-      // take: limit,
     });
 
     // Add mood data to each entry
@@ -229,20 +137,16 @@ export async function getJournalEntries({
       success: true,
       data: {
         entries: entriesWithMoodData,
-        // pagination: {
-        //   total: totalEntries,
-        //   pages: totalPages,
-        //   current: page,
-        //   hasMore: page < totalPages,
-        // },
       },
     };
   } catch (error) {
+    console.error("Error getting journal entries:", error);
     return { success: false, error: error.message };
   }
 }
 
-export async function getJounralEntry(id) {
+// Get Journal Entry function
+export async function getJournalEntry(id) {
   try {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
@@ -270,10 +174,12 @@ export async function getJounralEntry(id) {
 
     return entry;
   } catch (error) {
+    console.error("Error getting journal entry:", error);
     throw new Error(error.message);
   }
 }
 
+// Delete Journal Entry function
 export async function deleteJournalEntry(id) {
   try {
     const { userId } = await auth();
@@ -285,7 +191,6 @@ export async function deleteJournalEntry(id) {
 
     if (!user) throw new Error("User not found");
 
-    // Check if entry exists and belongs to user
     const entry = await db.entry.findFirst({
       where: {
         id,
@@ -303,10 +208,12 @@ export async function deleteJournalEntry(id) {
     revalidatePath("/dashboard");
     return entry;
   } catch (error) {
+    console.error("Error deleting journal entry:", error);
     throw new Error(error.message);
   }
 }
 
+// Get Draft function
 export async function getDraft() {
   try {
     const { userId } = await auth();
@@ -326,10 +233,12 @@ export async function getDraft() {
 
     return { success: true, data: draft };
   } catch (error) {
+    console.error("Error getting draft:", error);
     return { success: false, error: error.message };
   }
 }
 
+// Save Draft function
 export async function saveDraft(data) {
   try {
     const { userId } = await auth();
@@ -361,22 +270,23 @@ export async function saveDraft(data) {
     revalidatePath("/dashboard");
     return { success: true, data: draft };
   } catch (error) {
+    console.error("Error saving draft:", error);
     return { success: false, error: error.message };
   }
 }
 
+// Update Journal Entry function
 export async function updateJournalEntry(data) {
   try {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { clerkUserID: userId },
     });
 
     if (!user) throw new Error("User not found");
 
-    // Check if entry exists and belongs to user
     const existingEntry = await db.entry.findFirst({
       where: {
         id: data.id,
@@ -386,17 +296,14 @@ export async function updateJournalEntry(data) {
 
     if (!existingEntry) throw new Error("Entry not found");
 
-    // Get mood data
     const mood = MOODS[data.mood.toUpperCase()];
     if (!mood) throw new Error("Invalid mood");
 
-    // Get new mood image if mood changed
     let moodImageUrl = existingEntry.moodImageUrl;
     if (existingEntry.mood !== mood.id) {
       moodImageUrl = await getPixabayImage(data.moodQuery);
     }
 
-    // Update the entry
     const updatedEntry = await db.entry.update({
       where: { id: data.id },
       data: {
@@ -413,6 +320,7 @@ export async function updateJournalEntry(data) {
     revalidatePath(`/journal/${data.id}`);
     return updatedEntry;
   } catch (error) {
+    console.error("Error updating journal entry:", error);
     throw new Error(error.message);
   }
 }

@@ -1,5 +1,7 @@
 import { getCollections } from '@/actions/collection'
 import { getJournalEntries } from '@/actions/journal';
+import { prisma } from '@/lib/prisma';
+
 import React from 'react'
 import Collections from './_components/collections';
 import MoodAnalytics from './_components/mood-analytics';
