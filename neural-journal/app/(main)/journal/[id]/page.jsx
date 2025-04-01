@@ -1,4 +1,4 @@
-import { getJounralEntry } from '@/actions/journal';
+import { getJournalEntry } from '@/actions/journal';
 import { getMoodById } from '@/app/lib/moods';
 import React from 'react'
 import Image from 'next/image';
@@ -8,25 +8,29 @@ import { format } from 'date-fns';
 import EditButton from './_components/edit-button';
 import DeleteDialog from './_components/delete-dialogue';
 
-const JournalEntryPage = async ({params}) => {
-    const { id } = params;
+const JournalEntryPage = async ({ params }) => {
+    const { id } = await params;
 
-    const entry = await getJounralEntry(id);
+    const entry = await getJournalEntry(id);
     const mood = getMoodById(entry.mood);
-  return (
-    <>
-    {entry.moodImageUrl && (
-        <div className='relative h-48 md:h-64 w-full'>
-            <Image
-            src={entry.moodImageUrl}
-            alt="Mood visualization"
-            className="object-contain"
-            fill
-            priority
-          />
-        </div>
-    )}
+    const imageUrl = entry.moodImageUrl && entry.moodImageUrl.startsWith("http")
+        ? entry.moodImageUrl
+        : "/neuraljournallogo.png"; // Default image in /public
 
+    return (
+        <>
+            {/* Render image only if moodImageUrl is present */}
+            {entry.moodImageUrl && (
+                <div className='relative h-48 md:h-64 w-full'>
+                    <Image
+                        src={imageUrl}
+                        alt="Mood visualization"
+                        className="object-contain"
+                        fill
+                        priority
+                    />
+                </div>
+            )}
     <div className='p-6 space-y-6'>
         <div className='space-y-4'>
             <div className='flex flex-wrap items-center justify-between gap-4'>
@@ -54,7 +58,7 @@ const JournalEntryPage = async ({params}) => {
 
                 <Badge variant="outline" style={{
                         backgroundColor: `var(--${mood?.color}-50)`,
-                        color: `var(--${mood?.color}-700)`,
+                        color: "#7c3aed",
                         borderColor: `var(--${mood?.color}-200)`,
                     }}
                 >
@@ -65,7 +69,7 @@ const JournalEntryPage = async ({params}) => {
 
         <hr/>
 
-        <div className='ql-snow'>
+        <div className='text-violet-100 ql-snow'>
             <div className='ql-editor' dangerouslySetInnerHTML={{__html:entry.content}}/>
         </div>
 
