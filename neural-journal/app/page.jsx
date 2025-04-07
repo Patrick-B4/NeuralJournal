@@ -37,8 +37,9 @@ const features = [
 ];
 
 export default async function Home() {
-  const advice = await getDailyPrompt();
-  const home = 1;
+  const adviceResponse = await getDailyPrompt();
+  const advice = adviceResponse?.data || "My Thoughts Today"; // Safely extract the data or provide a fallback
+
   return (
     <div className="relative container mx-auto px-4 pt-16 pb-16">
       <div className="max-w-5xl mx-auto text-center space-y-8">
@@ -68,7 +69,7 @@ export default async function Home() {
             </div>
             <div className="space-y-4 p-4">
               <h3 className="text-xl font-semibold text-violet-900">
-                {advice ? advice : "My Thoughts Today"}
+                {advice}
               </h3>
               <Skeleton className="h-4 bg-violet-100 rounded w-3/4" />
               <Skeleton className="h-4 bg-violet-100 rounded w-full" />
