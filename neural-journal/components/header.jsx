@@ -16,7 +16,7 @@ const SiteHeader = async() => {
   return (
     <header className='container mx-auto'>
         <nav className='py-6 px-4 flex justify-between items-center'>
-            <Link href={"/"}>
+            <Link href={"/dashboard"}>
                 <Image
                 src={'/neuraljournallogo.png'} alt='Neural Journal Logo' width={300} height={300}
                 className='h-10 w-auto object-contain'
