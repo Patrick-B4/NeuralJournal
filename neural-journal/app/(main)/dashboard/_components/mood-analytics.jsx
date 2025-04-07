@@ -72,7 +72,7 @@ const MoodAnalytics = () => {
       <div className='flex justify-between items-center'>
         <h2 className='text-5xl font-bold gradient-title'>Dashboard</h2>
         <Select value={period} onValueChange={setPeriod}>
-          <SelectTrigger className='w-[140px]'>
+          <SelectTrigger className='w-[140px] bg-white'>
             <SelectValue/>
           </SelectTrigger>
           <SelectContent>
