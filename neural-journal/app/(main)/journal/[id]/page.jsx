@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import EditButton from './_components/edit-button';
 import DeleteDialog from './_components/delete-dialogue';
+import GenerateSummary from './_components/generate-summary';
+
 
 const JournalEntryPage = async ({ params }) => {
     const { id } = await params;
@@ -72,6 +74,9 @@ const JournalEntryPage = async ({ params }) => {
         <div className='text-violet-100 ql-snow'>
             <div className='ql-editor' dangerouslySetInnerHTML={{__html:entry.content}}/>
         </div>
+
+        <GenerateSummary entryHtml={entry.content} />
+
 
         <div className="text-sm text-gray-500 pt-4 border-t">
           Last updated {format(new Date(entry.updatedAt), "PPP 'at' p")}
